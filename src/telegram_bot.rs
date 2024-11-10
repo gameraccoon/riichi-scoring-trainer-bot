@@ -1,7 +1,7 @@
 // Copyright (C) Pavel Grebnev 2024
 // Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
 
-use crate::hand_score::HandScore;
+use crate::hand_score::HandScoreData;
 use crate::translations::*;
 use crate::user_settings::*;
 use crate::user_state::*;
@@ -36,8 +36,8 @@ fn text_response(text: &str) -> Vec<Response> {
     .to_vec()
 }
 
-fn generate_new_hand_text(hand_score: &mut Option<HandScore>, settings: &UserSettings) -> String {
-    *hand_score = Some(HandScore::generate_winning_hand(settings.scoring_settings));
+fn generate_new_hand_text(hand_score: &mut Option<HandScoreData>, settings: &UserSettings) -> String {
+    *hand_score = Some(HandScoreData::generate_winning_hand(settings.scoring_settings));
     let score = hand_score.as_ref().unwrap();
     format!(
         "{} han{}\n{}\n{}{}",
@@ -188,26 +188,28 @@ fn process_user_message(
             0
         };
 
-        if total_others == hand_score.total_other && total_dealer == hand_score.total_dealer
-            || total_others == hand_score.total_dealer && total_dealer == hand_score.total_other
+        let totals = hand_score.calculate_totals(settings.scoring_settings);
+
+        if total_others == totals.others && total_dealer == totals.dealer
+            || total_others == totals.dealer && total_dealer == totals.others
         {
             text_response_str(
                 "Correct score\n\nNext hand:\n".to_string()
                     + &generate_new_hand_text(opt_hand_score, settings),
             )
         } else {
-            if hand_score.total_dealer == 0 {
+            if totals.dealer == 0 {
                 text_response_str(
                     format!(
                         "Incorrect score, correct score is\n{}\n\nNext hand:\n",
-                        hand_score.total_other
+                        totals.others
                     ) + &generate_new_hand_text(opt_hand_score, settings),
                 )
             } else {
                 text_response_str(
                     format!(
                         "Incorrect score, correct score is\n{}/{}\n\nNext hand:\n",
-                        hand_score.total_other, hand_score.total_dealer
+                        totals.others, totals.dealer
                     ) + &generate_new_hand_text(opt_hand_score, settings),
                 )
             }

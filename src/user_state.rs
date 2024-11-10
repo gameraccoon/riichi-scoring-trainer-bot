@@ -8,7 +8,7 @@ use dashmap::DashMap;
 use std::path::Path;
 use teloxide::types::ChatId;
 
-use crate::hand_score::HandScore;
+use crate::hand_score::HandScoreData;
 use crate::user_state_updaters::update_user_states_to_the_latest_version;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -23,7 +23,7 @@ pub struct UserStates {
 
 #[derive(Clone)]
 pub struct UserState {
-    pub hand_score: Option<HandScore>,
+    pub hand_score: Option<HandScoreData>,
     pub settings: UserSettings,
     pub settings_unsaved: bool,
 }

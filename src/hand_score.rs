@@ -11,9 +11,7 @@ pub struct ScoringSettings {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct HandScore {
-    pub total_dealer: u16,
-    pub total_other: u16,
+pub struct HandScoreData {
     pub han: u8,
     pub fu: u8,
     pub honba: u8,
@@ -21,7 +19,12 @@ pub struct HandScore {
     pub is_dealer: bool,
 }
 
-impl HandScore {
+pub struct HandScoreTotals {
+    pub dealer: u16,
+    pub others: u16,
+}
+
+impl HandScoreData {
     fn generate_gaussian(mean: f64, std_dev: f64, min: f64, max: f64) -> f64 {
         let mut x = 0.0;
         let mut y = 0.0;
@@ -42,14 +45,14 @@ impl HandScore {
         }
     }
 
-    pub fn generate_winning_hand(settings: ScoringSettings) -> HandScore {
+    pub fn generate_winning_hand(settings: ScoringSettings) -> HandScoreData {
         let is_ron = rand::random::<bool>();
         let is_chiitoi = rand::random::<f32>() < 0.0252;
 
         let min_han = if is_chiitoi { 2.0 } else { 1.0 };
 
         // bell curve for han with mean 3 and standard deviation 2
-        let han = HandScore::generate_gaussian(3.0, 2.0, min_han, 20.0) as u8;
+        let han = HandScoreData::generate_gaussian(3.0, 2.0, min_han, 20.0) as u8;
 
         let (min_fu, max_fu) = if is_chiitoi {
             (25.0, 25.0)
@@ -75,9 +78,7 @@ impl HandScore {
             0
         };
 
-        let mut score = HandScore {
-            total_dealer: 0,
-            total_other: 0,
+        let mut score = HandScoreData {
             han,
             fu,
             honba,
@@ -89,12 +90,10 @@ impl HandScore {
             },
         };
 
-        score.calc_totals(settings);
-
         score
     }
 
-    pub fn calc_totals(&mut self, settings: ScoringSettings) {
+    pub fn calculate_totals(&self, settings: ScoringSettings) -> HandScoreTotals {
         // 0 is 5 han, max is 11 han
         const LIMITS: [u16; 7] = [2000, 3000, 3000, 4000, 4000, 4000, 6000];
 
@@ -127,30 +126,34 @@ impl HandScore {
             base = std::cmp::min(self.fu as u16 * 2u16.pow(2 + self.han as u32), 2000);
         }
 
+        let mut totals = HandScoreTotals {
+            dealer: 0,
+            others: 0,
+        };
+
         if self.ron {
             if self.is_dealer {
-                self.total_dealer = 0;
-                self.total_other = base * 6;
+                totals.others = base * 6;
             } else {
-                self.total_dealer = 0;
-                self.total_other = base * 4;
+                totals.others = base * 4;
             }
         } else {
             if self.is_dealer {
-                self.total_dealer = 0;
-                self.total_other = base * 2;
+                totals.others = base * 2;
             } else {
-                self.total_dealer = base * 2;
-                self.total_other = base;
+                totals.dealer = base * 2;
+                totals.others = base;
             }
         }
 
         // round totals up to the next 100
-        self.total_dealer = (self.total_dealer + 99) / 100 * 100;
-        self.total_other = (self.total_other + 99) / 100 * 100;
+        totals.dealer = (totals.dealer + 99) / 100 * 100;
+        totals.others = (totals.others + 99) / 100 * 100;
 
         // add honba
-        self.total_dealer += if self.total_dealer != 0 { self.honba as u16 * 100 } else { 0 };
-        self.total_other += self.honba as u16 * if self.ron { 300 } else { 100 };
+        totals.dealer += if totals.dealer != 0 { self.honba as u16 * 100 } else { 0 };
+        totals.others += self.honba as u16 * if self.ron { 300 } else { 100 };
+
+        totals
     }
 }
