@@ -13,7 +13,7 @@ pub struct UserSettings {
 pub fn get_default_settings() -> UserSettings {
     UserSettings {
         scoring_settings: ScoringSettings {
-            use_4_30_mangan: false,
+            use_kiriage_mangan: false,
             use_honba: false,
             use_kazoe_yakuman: true,
         },

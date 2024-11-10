@@ -106,7 +106,7 @@ fn process_user_message(
 /toggle_kiriage_mangan - turn {} counting 4 han 30 fu and 3 han 60 fu as mangan
 /toggle_honba - turn {} honba counting
 /toggle_kazoe - turn {} counting kazoe yakuman",
-                if user_state.settings.scoring_settings.use_4_30_mangan {
+                if user_state.settings.scoring_settings.use_kiriage_mangan {
                     "off"
                 } else {
                     "on"
@@ -124,11 +124,11 @@ fn process_user_message(
             ))
         }
         Some("/toggle_kiriage_mangan") => {
-            settings.scoring_settings.use_4_30_mangan = !settings.scoring_settings.use_4_30_mangan;
+            settings.scoring_settings.use_kiriage_mangan = !settings.scoring_settings.use_kiriage_mangan;
             user_state.settings_unsaved = true;
             return text_response_str(format!(
                 "4 han 30 fu is now {}counted as mangan",
-                if settings.scoring_settings.use_4_30_mangan {
+                if settings.scoring_settings.use_kiriage_mangan {
                     ""
                 } else {
                     "not "

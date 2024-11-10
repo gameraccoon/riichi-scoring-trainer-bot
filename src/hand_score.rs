@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ScoringSettings {
-    pub use_4_30_mangan: bool,
+    pub use_kiriage_mangan: bool,
     pub use_honba: bool,
     pub use_kazoe_yakuman: bool,
 }
@@ -130,7 +130,7 @@ impl HandScoreData {
                     base = LIMITS[index];
                 }
             }
-        } else if settings.use_4_30_mangan
+        } else if settings.use_kiriage_mangan
             && (self.han == 4 && self.fu == 30 || self.han == 3 && self.fu == 60)
         {
             // 4 han 30 fu or 3 han 60 fu is mangan when kiriage mangan is on
