@@ -59,19 +59,23 @@ impl HandScoreData {
 
         let min_han = if is_chiitoi { 2.0 } else { 1.0 };
 
-        // bell curve for han with mean 3 and standard deviation 2
-        let han = HandScoreData::generate_gaussian(3.0, 2.0, min_han, 20.0) as u8;
+        // bell curve for han with mean 2 and standard deviation 3
+        let han = HandScoreData::generate_gaussian(2.0, 3.0, min_han, 20.0) as u8;
 
         let (min_fu, max_fu) = if is_chiitoi {
             (25.0, 25.0)
         } else {
-            let min = if han == 1 || (han == 2 && is_ron) { 30.0 } else { 20.0 };
+            let min = if han == 1 || (han == 2 && is_ron) {
+                30.0
+            } else {
+                20.0
+            };
             let max = if is_ron { 110.0 } else { 100.0 };
             (min, max)
         };
 
-        // bell curve for fu with mean 30 and standard deviation 10
-        let fu_not_rounded = Self::generate_gaussian(30.0, 10.0, min_fu, max_fu) as u8;
+        // bell curve for fu with mean 32 and standard deviation 10
+        let fu_not_rounded = Self::generate_gaussian(32.0, 10.0, min_fu, max_fu) as u8;
         let fu = if min_fu == 25.0 {
             25
         } else {
