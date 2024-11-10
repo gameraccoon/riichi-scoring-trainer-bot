@@ -16,6 +16,7 @@ pub fn get_default_settings() -> UserSettings {
             use_kiriage_mangan: false,
             use_honba: false,
             use_kazoe_yakuman: true,
+            only_less_than_5_han: false,
         },
         language_key: "en".to_string(),
     }

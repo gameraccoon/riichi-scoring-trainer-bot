@@ -8,6 +8,7 @@ pub struct ScoringSettings {
     pub use_kiriage_mangan: bool,
     pub use_honba: bool,
     pub use_kazoe_yakuman: bool,
+    pub only_less_than_5_han: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,9 +59,10 @@ impl HandScoreData {
         let is_chiitoi = rand::random::<f32>() < 0.0252;
 
         let min_han = if is_chiitoi { 2.0 } else { 1.0 };
+        let max_han = if settings.only_less_than_5_han { 5.0 } else { 20.0 };
 
         // bell curve for han with mean 2 and standard deviation 3
-        let han = HandScoreData::generate_gaussian(2.0, 3.0, min_han, 20.0) as u8;
+        let han = HandScoreData::generate_gaussian(2.0, 3.0, min_han, max_han) as u8;
 
         let (min_fu, max_fu) = if is_chiitoi {
             (25.0, 25.0)

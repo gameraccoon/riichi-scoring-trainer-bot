@@ -105,7 +105,8 @@ fn process_user_message(
                 "
 /toggle_kiriage_mangan - turn {} counting 4 han 30 fu and 3 han 60 fu as mangan
 /toggle_honba - turn {} honba counting
-/toggle_kazoe - turn {} counting kazoe yakuman",
+/toggle_kazoe - turn {} counting kazoe yakuman
+/toggle_less_than_5_han - turn {} only showing hands with less than 5 han",
                 if user_state.settings.scoring_settings.use_kiriage_mangan {
                     "off"
                 } else {
@@ -117,6 +118,11 @@ fn process_user_message(
                     "on"
                 },
                 if user_state.settings.scoring_settings.use_kazoe_yakuman {
+                    "off"
+                } else {
+                    "on"
+                },
+                if user_state.settings.scoring_settings.only_less_than_5_han {
                     "off"
                 } else {
                     "on"
@@ -157,6 +163,19 @@ fn process_user_message(
                     ""
                 } else {
                     "not "
+                }
+            ));
+        }
+        Some("/toggle_less_than_5_han") => {
+            settings.scoring_settings.only_less_than_5_han =
+                !settings.scoring_settings.only_less_than_5_han;
+            user_state.settings_unsaved = true;
+            return text_response_str(format!(
+                "Hands with more than 5 han are {}",
+                if settings.scoring_settings.only_less_than_5_han {
+                    "disabled"
+                } else {
+                    "enabled"
                 }
             ));
         }
