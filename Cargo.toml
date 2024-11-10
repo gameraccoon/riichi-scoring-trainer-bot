@@ -1,5 +1,5 @@
 [package]
-name = "telegram-riichi-scoring-trainer-bot"
+name = "riichi-scoring-trainer"
 version = "0.1.0"
 edition = "2021"
 
