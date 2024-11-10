@@ -156,7 +156,7 @@ fn process_user_message(
             ));
         }
         Some("/help") => {
-            return text_response("Some description here");
+            return text_response("This bot helps training score counting in riichi mahjong.\n\nSend /start to start a new game, then send the score in the format 1000 or 1000/2000 to check if it's correct.\n\nSend /settings to see and change the settings");
         }
         Some(_) => {}
         None => {}
