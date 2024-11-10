@@ -26,23 +26,31 @@ pub struct HandScoreTotals {
 
 impl HandScoreData {
     fn generate_gaussian(mean: f64, std_dev: f64, min: f64, max: f64) -> f64 {
-        let mut x = 0.0;
-        let mut y = 0.0;
-        let mut s = 0.0;
-        while s >= 1.0 || s == 0.0 {
-            x = 2.0 * rand::random::<f64>() - 1.0;
-            y = 2.0 * rand::random::<f64>() - 1.0;
-            s = x * x + y * y;
+        if min >= max {
+            return min;
         }
-        let result = mean + std_dev * x * (-2.0 * s.ln() / s).sqrt();
 
-        if result < min {
-            min
-        } else if result > max {
-            max
-        } else {
-            result
+        let mut loop_count = 0;
+
+        while loop_count < 100 {
+            loop_count += 1;
+
+            let mut x = 0.0;
+            let mut y = 0.0;
+            let mut s = 0.0;
+            while s >= 1.0 || s == 0.0 {
+                x = 2.0 * rand::random::<f64>() - 1.0;
+                y = 2.0 * rand::random::<f64>() - 1.0;
+                s = x * x + y * y;
+            }
+            let result = mean + std_dev * x * (-2.0 * s.ln() / s).sqrt();
+
+            if result >= min && result <= max {
+                return result;
+            }
         }
+
+        min
     }
 
     pub fn generate_winning_hand(settings: ScoringSettings) -> HandScoreData {
