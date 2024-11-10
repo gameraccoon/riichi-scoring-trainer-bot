@@ -148,5 +148,9 @@ impl HandScore {
         // round totals up to the next 100
         self.total_dealer = (self.total_dealer + 99) / 100 * 100;
         self.total_other = (self.total_other + 99) / 100 * 100;
+
+        // add honba
+        self.total_dealer += if self.total_dealer != 0 { self.honba as u16 * 100 } else { 0 };
+        self.total_other += self.honba as u16 * if self.ron { 300 } else { 100 };
     }
 }
