@@ -83,9 +83,9 @@ impl HandScoreData {
             (fu_not_rounded + 5) / 10 * 10
         };
 
-        // bell curve for honba with mean 0 and standard deviation 2
+        // bell curve for honba with mean 0 and standard deviation 1.5
         let honba = if settings.use_honba {
-            Self::generate_gaussian(0.0, 2.0, 0.0, 12.0) as u8
+            Self::generate_gaussian(0.0, 1.5, 0.0, 12.0) as u8
         } else {
             0
         };
