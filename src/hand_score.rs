@@ -118,7 +118,9 @@ impl HandScoreData {
                     base = LIMITS[index];
                 }
             }
-        } else if settings.use_4_30_mangan && (self.han == 4 && self.fu == 30 || self.han == 3 && self.fu == 60) {
+        } else if settings.use_4_30_mangan
+            && (self.han == 4 && self.fu == 30 || self.han == 3 && self.fu == 60)
+        {
             // 4 han 30 fu or 3 han 60 fu is mangan when kiriage mangan is on
             base = 2000;
         } else {
@@ -151,7 +153,11 @@ impl HandScoreData {
         totals.others = (totals.others + 99) / 100 * 100;
 
         // add honba
-        totals.dealer += if totals.dealer != 0 { self.honba as u16 * 100 } else { 0 };
+        totals.dealer += if totals.dealer != 0 {
+            self.honba as u16 * 100
+        } else {
+            0
+        };
         totals.others += self.honba as u16 * if self.ron { 300 } else { 100 };
 
         totals

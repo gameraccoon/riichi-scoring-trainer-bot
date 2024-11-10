@@ -36,8 +36,13 @@ fn text_response(text: &str) -> Vec<Response> {
     .to_vec()
 }
 
-fn generate_new_hand_text(hand_score: &mut Option<HandScoreData>, settings: &UserSettings) -> String {
-    *hand_score = Some(HandScoreData::generate_winning_hand(settings.scoring_settings));
+fn generate_new_hand_text(
+    hand_score: &mut Option<HandScoreData>,
+    settings: &UserSettings,
+) -> String {
+    *hand_score = Some(HandScoreData::generate_winning_hand(
+        settings.scoring_settings,
+    ));
     let score = hand_score.as_ref().unwrap();
     format!(
         "{} han{}\n{}\n{}{}",
