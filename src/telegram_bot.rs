@@ -98,7 +98,7 @@ fn process_user_message(
 
     match message_split.next() {
         Some("/start") => {
-            return text_response_str(generate_new_hand_text(opt_hand_score, settings))
+            return text_response_str(generate_new_hand_text(opt_hand_score, settings) + "\n\nAnswer with the score in format 1000 or 1000/2000\n(you can also use space instead of /)");
         }
         Some("/settings") => {
             return text_response(&format!(
@@ -106,7 +106,7 @@ fn process_user_message(
 /toggle_kiriage_mangan - turn {} counting 4 han 30 fu and 3 han 60 fu as mangan
 /toggle_honba - turn {} honba counting
 /toggle_kazoe - turn {} counting kazoe yakuman
-/toggle_less_than_5_han - turn {} only showing hands with less than 5 han",
+/toggle_less_than_5_han - {} hands with 5 or more han",
                 if user_state.settings.scoring_settings.use_kiriage_mangan {
                     "off"
                 } else {
@@ -123,9 +123,9 @@ fn process_user_message(
                     "on"
                 },
                 if user_state.settings.scoring_settings.only_less_than_5_han {
-                    "off"
+                    "turn on"
                 } else {
-                    "on"
+                    "turn off"
                 }
             ))
         }
@@ -171,7 +171,7 @@ fn process_user_message(
                 !settings.scoring_settings.only_less_than_5_han;
             user_state.settings_unsaved = true;
             return text_response_str(format!(
-                "Hands with more than 5 han are {}",
+                "Hands with 5 or more han are {}",
                 if settings.scoring_settings.only_less_than_5_han {
                     "disabled"
                 } else {
@@ -180,7 +180,7 @@ fn process_user_message(
             ));
         }
         Some("/help") => {
-            return text_response("This bot helps training score counting in riichi mahjong.\n\nSend /start to start a new game, then send the score in the format 1000 or 1000/2000 to check if it's correct.\n\nSend /settings to see and change the settings");
+            return text_response("This bot helps training score counting in riichi mahjong.\n\nSend /start to start a new game, then send the score in the format 1000 or 1000/2000 to check if it's correct.\nYou can also use space instead of \"/\".\n\nSend /settings to see and change the settings");
         }
         Some(_) => {}
         None => {}
@@ -199,14 +199,14 @@ fn process_user_message(
         let total_others = if let Ok(others_score) = others_score.parse::<u16>() {
             others_score
         } else {
-            return text_response("Failed to parse score, format is 1000 or 1000/2000");
+            return text_response("Failed to parse the score, the format is 1000 or 1000/2000");
         };
 
         let total_dealer = if let Some(total_dealer) = second_part {
             if let Ok(total_dealer) = total_dealer.parse::<u16>() {
                 total_dealer
             } else {
-                return text_response("Failed to parse score, format is 1000 or 1000/2000");
+                return text_response("Failed to parse the score, format is 1000 or 1000/2000");
             }
         } else {
             0
@@ -214,25 +214,39 @@ fn process_user_message(
 
         let totals = hand_score.calculate_totals(settings.scoring_settings);
 
+        if total_others % 100 != 0 || total_dealer % 100 != 0 {
+            return text_response("The score must be divisible by 100.\nTry again");
+        }
+
         if total_others == totals.others && total_dealer == totals.dealer
             || total_others == totals.dealer && total_dealer == totals.others
         {
             text_response_str(
-                "Correct score\n\nNext hand:\n".to_string()
+                "Correct!\n\nNext hand:\n".to_string()
                     + &generate_new_hand_text(opt_hand_score, settings),
             )
         } else {
+            if (totals.dealer == 0) != (total_dealer == 0) {
+                return if hand_score.ron {
+                    text_response("The format is incorrect, did you write tsumo score instead of ron?\nTry again")
+                } else if hand_score.is_dealer {
+                    text_response("The format is incorrect, did you write non-dealer score instead of dealer?\nTry again")
+                } else {
+                    text_response("The format is incorrect, a score in format 1000/2000 is expected\nTry again")
+                }
+            }
+
             if totals.dealer == 0 {
                 text_response_str(
                     format!(
-                        "Incorrect score, correct score is\n{}\n\nNext hand:\n",
+                        "Not correct.\nThe score is\n{}\n\nNext hand:\n",
                         totals.others
                     ) + &generate_new_hand_text(opt_hand_score, settings),
                 )
             } else {
                 text_response_str(
                     format!(
-                        "Incorrect score, correct score is\n{}/{}\n\nNext hand:\n",
+                        "Not correct.\nThe score is\n{}/{}\n\nNext hand:\n",
                         totals.others, totals.dealer
                     ) + &generate_new_hand_text(opt_hand_score, settings),
                 )
