@@ -119,8 +119,8 @@ impl HandScore {
                     base = LIMITS[index];
                 }
             }
-        } else if settings.use_4_30_mangan && self.han == 4 && self.fu == 30 {
-            // 4 han 30 fu
+        } else if settings.use_4_30_mangan && (self.han == 4 && self.fu == 30 || self.han == 3 && self.fu == 60) {
+            // 4 han 30 fu or 3 han 60 fu is mangan when kiriage mangan is on
             base = 2000;
         } else {
             // normal hands
