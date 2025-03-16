@@ -67,7 +67,7 @@ impl HandScoreData {
         let (min_fu, max_fu) = if is_chiitoi {
             (25.0, 25.0)
         } else {
-            let min = if han == 1 || (han == 2 && is_ron) {
+            let min = if han == 1 || is_ron {
                 30.0
             } else {
                 20.0
